@@ -10,18 +10,18 @@ Application web pour EMG Voitures, une entreprise qui achète, répare et revend
 
 ## Installation
 1. Cloner le dépôt :
-```git clone https://github.com/Anonymous1223334444/EMGANSA.git```
+    git clone https://github.com/Anonymous1223334444/EMGANSA.git
 
 2. Naviguer vers le dossier du projet :
-```cd EMGANSA```
+    cd EMGANSA
 
 3. Restaurer les packages :
-```dotnet restore```
+    dotnet restore
 
 4. Exécuter l'application :
-```dotnet run```
+    dotnet run
 
-5. Ouvrir un navigateur et accéder à https://localhost:5001
+5. Ouvrir un navigateur et accéder à http://localhost:5189
 
 ## Structure du projet
 - **Controllers/** : Contrôleurs MVC
