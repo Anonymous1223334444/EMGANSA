@@ -17,9 +17,6 @@ namespace EMGANSA.Models
         [StringLength(100)]
         public string? Titre { get; set; }
 
-        [StringLength(255)]
-        public string? Description { get; set; }
-
         public bool EstPrincipale { get; set; } = false;
 
         // Navigation property

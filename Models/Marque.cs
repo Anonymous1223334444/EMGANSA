@@ -14,9 +14,6 @@ namespace EMGANSA.Models
         [StringLength(255)]
         public string? Description { get; set; }
 
-        [StringLength(255)]
-        public string? LogoUrl { get; set; }
-
         // Navigation property
         public virtual ICollection<Modele> Modeles { get; set; } = new List<Modele>();
     }

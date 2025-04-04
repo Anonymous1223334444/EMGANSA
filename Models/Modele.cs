@@ -15,9 +15,6 @@ namespace EMGANSA.Models
         [ForeignKey("Marque")]
         public int MarqueId { get; set; }
         
-        [StringLength(255)]
-        public string? Description { get; set; }
-
         // Navigation properties
         public virtual Marque Marque { get; set; }
         public virtual ICollection<Voiture> Voitures { get; set; } = new List<Voiture>();

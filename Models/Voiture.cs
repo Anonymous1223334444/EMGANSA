@@ -12,9 +12,6 @@ namespace EMGANSA.Models
         [ForeignKey("Modele")]
         public int ModeleId { get; set; }
 
-        [ForeignKey("Couleur")]
-        public int CouleurId { get; set; }
-
         [Required(ErrorMessage = "L'année de fabrication est obligatoire")]
         [Range(2018, 2100, ErrorMessage = "L'année doit être 2018 ou plus récente")]
         public int Annee { get; set; }
@@ -40,7 +37,6 @@ namespace EMGANSA.Models
 
         // Navigation properties
         public virtual Modele Modele { get; set; }
-        public virtual Couleur Couleur { get; set; }
         public virtual ICollection<PhotoVoiture> Photos { get; set; } = new List<PhotoVoiture>();
     }
 }
