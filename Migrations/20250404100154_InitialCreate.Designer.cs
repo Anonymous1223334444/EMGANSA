@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMGANSA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250404082808_InitialCreate")]
+    [Migration("20250404100154_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

@@ -1,0 +1,31 @@
+@model IEnumerable<EMGANSA.Models.Voiture>
+
+@{
+    ViewData["Title"] = "Inventaire des voitures";
+}
+
+<h1>Inventaire des voitures</h1>
+
+<div class="row">
+    @foreach (var voiture in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                @{
+                    var photo = voiture.Photos.FirstOrDefault(p => p.EstPrincipale);
+                    var photoUrl = photo != null ? photo.CheminImage : "/images/no-image.png";
+                }
+                <img src="@photoUrl" class="card-img-top" alt="@voiture.Modele.Marque.Nom @voiture.Modele.Nom">
+                <div class="card-body">
+                    <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom (@voiture.Annee)</h5>
+                    <p class="card-text">
+                        <strong>Prix:</strong> @voiture.Prix.ToString("C0")<br />
+                        <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km<br />
+                        <strong>Statut:</strong> @voiture.Statut
+                    </p>
+                    <a href="#" class="btn btn-primary">Voir détails</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
