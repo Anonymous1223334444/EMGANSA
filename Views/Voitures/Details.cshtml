@@ -1,0 +1,101 @@
+@model EMGANSA.Models.Voiture
+
+@{
+    ViewData["Title"] = $"{Model.Modele.Marque.Nom} {Model.Modele.Nom} ({Model.Annee})";
+}
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        @if (Model.Photos.Any())
+        {
+            <div id="carouselVoiture" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @{
+                        bool isFirst = true;
+                    }
+                    @foreach (var photo in Model.Photos)
+                    {
+                        <div class="carousel-item @(isFirst ? "active" : "")">
+                            <img src="@photo.CheminImage" class="d-block w-100" alt="@photo.Titre">
+                        </div>
+                        isFirst = false;
+                    }
+                </div>
+                @if (Model.Photos.Count() > 1)
+                {
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselVoiture" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Précédent</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselVoiture" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Suivant</span>
+                    </button>
+                }
+            </div>
+        }
+        else
+        {
+            <img src="/images/no-image.png" class="img-fluid" alt="Image non disponible">
+        }
+    </div>
+    <div class="col-md-6">
+        <h1 class="mb-3">@Model.Modele.Marque.Nom @Model.Modele.Nom</h1>
+        <h4 class="text-primary">@Model.Prix.ToString("C0")</h4>
+        
+        <div class="mb-4">
+            @switch (Model.Statut)
+            {
+                case StatutVoiture.Disponible:
+                    <span class="badge bg-success text-white">Disponible</span>
+                    break;
+                case StatutVoiture.Reservee:
+                    <span class="badge bg-warning text-dark">Réservée</span>
+                    break;
+                case StatutVoiture.Vendue:
+                    <span class="badge bg-danger text-white">Vendue</span>
+                    break;
+                case StatutVoiture.EnReparation:
+                    <span class="badge bg-info text-dark">En réparation</span>
+                    break;
+                case StatutVoiture.NonDisponible:
+                    <span class="badge bg-secondary text-white">Non disponible</span>
+                    break;
+            }
+        </div>
+
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th style="width: 40%">Marque</th>
+                    <td>@Model.Modele.Marque.Nom</td>
+                </tr>
+                <tr>
+                    <th>Modèle</th>
+                    <td>@Model.Modele.Nom</td>
+                </tr>
+                <tr>
+                    <th>Année</th>
+                    <td>@Model.Annee</td>
+                </tr>
+                <tr>
+                    <th>Kilométrage</th>
+                    <td>@Model.Kilometrage.ToString("N0") km</td>
+                </tr>
+                <tr>
+                    <th>Date d'acquisition</th>
+                    <td>@Model.DateAcquisition.ToString("dd/MM/yyyy")</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="mt-4">
+            <h4>Description</h4>
+            <p>@(string.IsNullOrEmpty(Model.Description) ? "Aucune description disponible" : Model.Description)</p>
+        </div>
+
+        <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
+</div>

@@ -1,11 +1,46 @@
-﻿@{
+﻿@model IEnumerable<EMGANSA.Models.Voiture>
+
+@{
     ViewData["Title"] = "Accueil";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bienvenue chez EMG Voitures</h1>
-    <p>Découvrez notre sélection de voitures d'occasion de qualité.</p>
-    <div class="mt-4">
-        <img src="https://placehold.co/600x400/000000/FFFFFF/png" alt="Voitures EMG" class="img-fluid rounded" />
+<div class="jumbotron">
+    <h1 class="display-4">Bienvenue chez EMGANSA Voitures</h1>
+    <p class="lead">Découvrez notre sélection de véhicules d'occasion de qualité.</p>
+    <hr class="my-4">
+    <p>Tous nos véhicules sont soigneusement contrôlés et révisés pour vous garantir fiabilité et sécurité.</p>
+    <p class="lead">
+        <a class="btn btn-primary btn-lg" asp-controller="Voitures" asp-action="Index" role="button">Voir l'inventaire complet</a>
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4">Nos dernières arrivées</h2>
     </div>
+</div>
+
+<div class="row">
+    @foreach (var voiture in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                @{
+                    var photoUrl = voiture.Photos.FirstOrDefault(p => p.EstPrincipale)?.CheminImage ?? "/images/no-image.png";
+                }
+                <img src="@photoUrl" class="card-img-top" alt="@voiture.Modele.Marque.Nom @voiture.Modele.Nom">
+                <div class="card-body">
+                    <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom</h5>
+                    <p class="card-text">
+                        <strong>Année:</strong> @voiture.Annee<br>
+                        <strong>Prix:</strong> @voiture.Prix.ToString("C0")<br>
+                        <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a asp-controller="Voitures" asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-sm btn-primary">Voir détails</a>
+                </div>
+            </div>
+        </div>
+    }
 </div>
