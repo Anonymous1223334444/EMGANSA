@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EMGANSA.Controllers
 {
@@ -67,6 +68,58 @@ namespace EMGANSA.Controllers
             }
 
             return View(voiture);
+        }
+        [Authorize(Roles = "Administrateur")]
+        public IActionResult Create()
+        {
+            // Code pour créer une nouvelle voiture
+            return View();
+        }
+
+        // POST: Voitures/Create - Accessible uniquement aux administrateurs
+        [Authorize(Roles = "Administrateur")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Voiture voiture)
+        {
+            // Code pour sauvegarder une nouvelle voiture
+            return View();
+        }
+
+        // GET: Voitures/Edit/5 - Accessible uniquement aux administrateurs
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            // Code pour éditer une voiture
+            return View();
+        }
+
+        // POST: Voitures/Edit/5 - Accessible uniquement aux administrateurs
+        [Authorize(Roles = "Administrateur")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Voiture voiture)
+        {
+            // Code pour sauvegarder les modifications
+            return View();
+        }
+
+        // GET: Voitures/Delete/5 - Accessible uniquement aux administrateurs
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            // Code pour supprimer une voiture
+            return View();
+        }
+
+        // POST: Voitures/Delete/5 - Accessible uniquement aux administrateurs
+        [Authorize(Roles = "Administrateur")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            // Code pour confirmer la suppression
+            return View();
         }
     }
 }
