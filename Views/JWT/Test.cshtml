@@ -1,0 +1,101 @@
+@{
+    ViewData["Title"] = "Test JWT";
+}
+
+<div class="container">
+    <h1>Test JWT</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Obtenir un token JWT</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Entrez votre email">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" class="form-control" id="password" placeholder="Entrez votre mot de passe">
+                    </div>
+                    <button id="btn-login" class="btn btn-primary">Se connecter</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Token JWT</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <textarea id="jwt-token" class="form-control" rows="10" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button id="btn-test" class="btn btn-success" disabled>Tester l'accès API</button>
+            </div>
+            <div class="mt-3" id="api-result"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            let token = '';
+
+            $('#btn-login').click(function() {
+                const email = $('#email').val();
+                const password = $('#password').val();
+
+                if (!email || !password) {
+                    alert('Veuillez entrer votre email et mot de passe');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/auth/login',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                    success: function(response) {
+                        token = response.token;
+                        $('#jwt-token').val(token);
+                        $('#btn-test').prop('disabled', false);
+                    },
+                    error: function(xhr) {
+                        alert('Échec de la connexion: ' + (xhr.responseJSON?.message || 'Erreur inconnue'));
+                    }
+                });
+            });
+
+            $('#btn-test').click(function() {
+                $.ajax({
+                    url: '/api/voituresapi',
+                    type: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    success: function(response) {
+                        let html = '<div class="alert alert-success">Succès! Nombre de voitures: ' + response.length + '</div>';
+                        html += '<ul>';
+                        response.forEach(function(voiture) {
+                            html += '<li>' + voiture.modele.marque.nom + ' ' + voiture.modele.nom + ' (' + voiture.annee + ')</li>';
+                        });
+                        html += '</ul>';
+                        $('#api-result').html(html);
+                    },
+                    error: function() {
+                        $('#api-result').html('<div class="alert alert-danger">Échec de l\'accès à l\'API</div>');
+                    }
+                });
+            });
+        });
+    </script>
+}
