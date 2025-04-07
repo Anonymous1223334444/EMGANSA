@@ -6,6 +6,21 @@
 
 <h1 class="mb-4">Inventaire des voitures</h1>
 
+<!-- @if (User.IsInRole("Administrateur"))
+{ -->
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Ajouter une voiture
+    </a>
+</div>
+<!-- } -->
+
+<div class="alert alert-info">
+    <p>IsAuthenticated: @User.Identity.IsAuthenticated</p>
+    <p>Name: @User.Identity.Name</p>
+    <p>IsInRole("Administrateur"): @User.IsInRole("Administrateur")</p>
+</div>
+
 <div class="row mb-4">
     <div class="col-md-6">
         <form asp-action="Index" method="get" class="form-inline">
@@ -16,15 +31,7 @@
                         <i class="bi bi-search"></i> Rechercher
                     </button>
                 </div>
-                
-                @if (User.IsInRole("Administrateur"))
-                {
-                    <div class="mb-3">
-                        <a asp-action="Create" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> Ajouter une voiture
-                        </a>
-                    </div>
-                }
+
             </div>
             <select name="statut" class="form-control mb-2 mr-sm-2" onchange="this.form.submit()">
                 <option value="">Tous les statuts</option>
