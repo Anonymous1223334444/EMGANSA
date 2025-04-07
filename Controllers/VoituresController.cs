@@ -1,20 +1,34 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using EMGANSA.Data;
 using EMGANSA.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using EMGANSA.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace EMGANSA.Controllers
 {
     public class VoituresController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly PhotoService _photoService;
 
-        public VoituresController(ApplicationDbContext context)
+        public VoituresController(
+            ApplicationDbContext context, 
+            IWebHostEnvironment webHostEnvironment,
+            PhotoService photoService)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
+            _photoService = photoService;
         }
 
         // GET: Voitures - Affiche la liste des voitures
@@ -69,57 +83,106 @@ namespace EMGANSA.Controllers
 
             return View(voiture);
         }
+
         [Authorize(Roles = "Administrateur")]
         public IActionResult Create()
         {
-            // Code pour créer une nouvelle voiture
-            return View();
+            ViewData["ModeleId"] = new SelectList(_context.Modeles
+                .Include(m => m.Marque)
+                .OrderBy(m => m.Marque.Nom)
+                .ThenBy(m => m.Nom), "Id", "NomComplet");
+            
+            return View(new VoitureViewModel
+            {
+                DateAcquisition = DateTime.Today,
+                Statut = StatutVoiture.Disponible
+            });
         }
 
-        // POST: Voitures/Create - Accessible uniquement aux administrateurs
-        [Authorize(Roles = "Administrateur")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Voiture voiture)
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> Create(VoitureViewModel viewModel)
         {
-            // Code pour sauvegarder une nouvelle voiture
-            return View();
+            if (ModelState.IsValid)
+            {
+                // Créer la voiture à partir du ViewModel
+                var voiture = new Voiture
+                {
+                    ModeleId = viewModel.ModeleId,
+                    Annee = viewModel.Annee,
+                    Kilometrage = viewModel.Kilometrage,
+                    Prix = viewModel.Prix,
+                    DateAcquisition = viewModel.DateAcquisition,
+                    Description = viewModel.Description,
+                    Statut = viewModel.Statut
+                };
+                
+                _context.Add(voiture);
+                await _context.SaveChangesAsync();
+                
+                // Traiter les photos si elles existent
+                if (viewModel.Photos != null && viewModel.Photos.Count > 0)
+                {
+                    await TraiterPhotosAsync(voiture.Id, viewModel.Photos);
+                }
+                
+                return RedirectToAction(nameof(Index));
+            }
+            
+            ViewData["ModeleId"] = new SelectList(_context.Modeles
+                .Include(m => m.Marque)
+                .OrderBy(m => m.Marque.Nom)
+                .ThenBy(m => m.Nom), "Id", "NomComplet", viewModel.ModeleId);
+            
+            return View(viewModel);
         }
 
-        // GET: Voitures/Edit/5 - Accessible uniquement aux administrateurs
-        [Authorize(Roles = "Administrateur")]
-        public async Task<IActionResult> Edit(int? id)
+        // Méthode auxiliaire pour traiter les photos
+        private async Task TraiterPhotosAsync(int voitureId, List<IFormFile> photos)
         {
-            // Code pour éditer une voiture
-            return View();
-        }
-
-        // POST: Voitures/Edit/5 - Accessible uniquement aux administrateurs
-        [Authorize(Roles = "Administrateur")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Voiture voiture)
-        {
-            // Code pour sauvegarder les modifications
-            return View();
-        }
-
-        // GET: Voitures/Delete/5 - Accessible uniquement aux administrateurs
-        [Authorize(Roles = "Administrateur")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            // Code pour supprimer une voiture
-            return View();
-        }
-
-        // POST: Voitures/Delete/5 - Accessible uniquement aux administrateurs
-        [Authorize(Roles = "Administrateur")]
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            // Code pour confirmer la suppression
-            return View();
+            var webRootPath = _webHostEnvironment.WebRootPath;
+            var uploadsFolder = Path.Combine(webRootPath, "images", "voitures");
+            
+            // Créer le dossier s'il n'existe pas
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+            
+            bool estPrincipale = !_context.PhotosVoitures.Any(p => p.VoitureId == voitureId && p.EstPrincipale);
+            
+            foreach (var photo in photos)
+            {
+                if (photo.Length > 0)
+                {
+                    // Générer un nom de fichier unique
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(photo.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    
+                    // Enregistrer le fichier
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await photo.CopyToAsync(stream);
+                    }
+                    
+                    // Créer l'entrée dans la base de données
+                    var photoVoiture = new PhotoVoiture
+                    {
+                        VoitureId = voitureId,
+                        CheminImage = "/images/voitures/" + fileName,
+                        Titre = Path.GetFileNameWithoutExtension(photo.FileName),
+                        EstPrincipale = estPrincipale
+                    };
+                    
+                    _context.Add(photoVoiture);
+                    
+                    // Seule la première photo est principale
+                    estPrincipale = false;
+                }
+            }
+            
+            await _context.SaveChangesAsync();
         }
     }
 }

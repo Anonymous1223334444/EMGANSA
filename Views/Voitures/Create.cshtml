@@ -1,0 +1,107 @@
+@model EMGANSA.Models.VoitureViewModel
+
+@{
+    ViewData["Title"] = "Ajouter une voiture";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Informations générales</h4>
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="ModeleId" class="control-label"></label>
+                        <select asp-for="ModeleId" class="form-control" asp-items="ViewBag.ModeleId">
+                            <option value="">-- Sélectionnez un modèle --</option>
+                        </select>
+                        <span asp-validation-for="ModeleId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Annee" class="control-label"></label>
+                                <input asp-for="Annee" class="form-control" />
+                                <span asp-validation-for="Annee" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Kilometrage" class="control-label"></label>
+                                <input asp-for="Kilometrage" class="form-control" />
+                                <span asp-validation-for="Kilometrage" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Prix" class="control-label"></label>
+                                <input asp-for="Prix" class="form-control" />
+                                <span asp-validation-for="Prix" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="DateAcquisition" class="control-label"></label>
+                                <input asp-for="DateAcquisition" class="form-control" type="date" />
+                                <span asp-validation-for="DateAcquisition" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Statut" class="control-label"></label>
+                        <select asp-for="Statut" class="form-control" asp-items="Html.GetEnumSelectList<EMGANSA.Models.StatutVoiture>()"></select>
+                        <span asp-validation-for="Statut" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Photos</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label asp-for="Photos" class="control-label"></label>
+                        <input asp-for="Photos" type="file" class="form-control" multiple accept="image/*" />
+                        <span asp-validation-for="Photos" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Vous pouvez sélectionner plusieurs photos. La première sera utilisée comme photo principale.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Ajouter
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

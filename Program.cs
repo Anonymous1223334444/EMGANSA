@@ -51,6 +51,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Configuration JWT
 builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<PhotoService>();
 
 // Configurer l'authentification JWT
 var jwtConfig = builder.Configuration.GetSection("JWT").Get<JwtConfig>();

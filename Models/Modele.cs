@@ -18,5 +18,7 @@ namespace EMGANSA.Models
         // Navigation properties
         public virtual Marque Marque { get; set; }
         public virtual ICollection<Voiture> Voitures { get; set; } = new List<Voiture>();
+        public string NomComplet => $"{Marque?.Nom} {Nom}";
     }
+
 }
