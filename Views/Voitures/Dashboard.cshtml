@@ -1,0 +1,68 @@
+@model Dictionary<EMGANSA.Models.StatutVoiture, int>
+
+@{
+    ViewData["Title"] = "Tableau de bord";
+}
+
+<h1>Tableau de bord des voitures</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Répartition des voitures par statut</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Statut</th>
+                            <th>Nombre</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge @GetBadgeClass(item.Key)">
+                                        @item.Key
+                                    </span>
+                                </td>
+                                <td>@item.Value</td>
+                                <td>
+                                    <a asp-action="Index" asp-route-statut="@((int)item.Key)" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> Voir
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total</th>
+                            <th>@Model.Values.Sum()</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetBadgeClass(StatutVoiture statut)
+    {
+        return statut switch
+        {
+            StatutVoiture.Disponible => "bg-success text-white",
+            StatutVoiture.Reservee => "bg-warning text-dark",
+            StatutVoiture.Vendue => "bg-danger text-white",
+            StatutVoiture.EnReparation => "bg-info text-dark",
+            StatutVoiture.NonDisponible => "bg-secondary text-white",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -51,12 +51,22 @@
                                     </button>
                                 </form>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Dashboard">
+                                    <i class="bi bi-graph-up"></i> Tableau de bord
+                                </a>
+                            </li>
                         }
                         else
                         {
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">
                                     <i class="bi bi-box-arrow-in-right"></i> Connexion
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Dashboard">
+                                    <i class="bi bi-graph-up"></i> Tableau de bord
                                 </a>
                             </li>
                         }

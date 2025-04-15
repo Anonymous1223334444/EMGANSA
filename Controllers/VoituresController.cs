@@ -62,6 +62,25 @@ namespace EMGANSA.Controllers
             return View(voitures);
         }
 
+        // GET: Voitures/Dashboard
+        public async Task<IActionResult> Dashboard()
+        {
+            var statutsCount = await _context.Voitures
+                .GroupBy(v => v.Statut)
+                .Select(g => new { Statut = g.Key, Count = g.Count() })
+                .ToListAsync();
+            
+            var statutsDict = new Dictionary<StatutVoiture, int>();
+            
+            foreach (var statut in Enum.GetValues(typeof(StatutVoiture)).Cast<StatutVoiture>())
+            {
+                var count = statutsCount.FirstOrDefault(s => s.Statut == statut)?.Count ?? 0;
+                statutsDict.Add(statut, count);
+            }
+            
+            return View(statutsDict);
+        }
+
         // GET: Voitures/Details/5 - Affiche les détails d'une voiture
         public async Task<IActionResult> Details(int? id)
         {
@@ -224,6 +243,90 @@ namespace EMGANSA.Controllers
             return View(viewModel);
         }
 
+        // GET: Voitures/ChangeStatus/5
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> ChangeStatus(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var voiture = await _context.Voitures
+                .Include(v => v.Modele)
+                .ThenInclude(m => m.Marque)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            
+            if (voiture == null)
+            {
+                return NotFound();
+            }
+            
+            var viewModel = new StatutChangeViewModel
+            {
+                VoitureId = voiture.Id,
+                NouveauStatut = voiture.Statut
+            };
+            
+            ViewData["VoitureInfo"] = $"{voiture.Modele.Marque.Nom} {voiture.Modele.Nom} ({voiture.Annee})";
+            ViewData["StatutActuel"] = voiture.Statut;
+            
+            return View(viewModel);
+        }
+
+        // POST: Voitures/ChangeStatus
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> ChangeStatus(StatutChangeViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var voiture = await _context.Voitures.FindAsync(viewModel.VoitureId);
+                
+                if (voiture == null)
+                {
+                    return NotFound();
+                }
+                
+                // Enregistrer l'ancien statut et le nouveau
+                var ancienStatut = voiture.Statut;
+                voiture.Statut = viewModel.NouveauStatut;
+                
+                // Mettre à jour la voiture
+                _context.Update(voiture);
+                
+                // Vous pourriez ajouter ici un historique des changements de statut
+                // si vous voulez garder une trace des modifications
+                
+                await _context.SaveChangesAsync();
+                
+                // Rediriger vers la page de détails
+                return RedirectToAction(nameof(Details), new { id = viewModel.VoitureId });
+            }
+            
+            return View(viewModel);
+        }
+
+        // POST: Voitures/QuickStatusChange
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> QuickStatusChange(int id, StatutVoiture statut)
+        {
+            var voiture = await _context.Voitures.FindAsync(id);
+            
+            if (voiture == null)
+            {
+                return NotFound();
+            }
+            
+            voiture.Statut = statut;
+            _context.Update(voiture);
+            await _context.SaveChangesAsync();
+            
+            return RedirectToAction(nameof(Index));
+        }
         // POST: Voitures/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
