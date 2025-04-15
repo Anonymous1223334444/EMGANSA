@@ -1,0 +1,151 @@
+@model IEnumerable<EMGANSA.Models.Voiture>
+
+@{
+    ViewData["Title"] = "Inventaire des voitures";
+}
+
+<h1 class="mb-4">Inventaire des voitures</h1>
+
+@if (User.IsInRole("Administrateur"))
+{
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Ajouter une voiture
+        </a>
+    </div>
+}
+
+<div class="alert alert-info">
+    <p>IsAuthenticated: @User.Identity.IsAuthenticated</p>
+    <p>Name: @User.Identity.Name</p>
+    <p>IsInRole("Administrateur"): @User.IsInRole("Administrateur")</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form asp-action="Index" method="get" class="form-inline">
+            <div class="input-group mb-2 mr-sm-2">
+                <input type="text" name="searchString" class="form-control" placeholder="Rechercher...">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> Rechercher
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="col-md-6 text-right">
+                <a asp-action="Recherche" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-search"></i> Recherche avancée
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Réinitialiser les filtres
+                </a>
+            </div>
+            <select name="statut" class="form-control mb-2 mr-sm-2" onchange="this.form.submit()">
+                <option value="">Tous les statuts</option>
+                <option value="@((int)StatutVoiture.Disponible)">Disponible</option>
+                <option value="@((int)StatutVoiture.Reservee)">Réservée</option>
+                <option value="@((int)StatutVoiture.Vendue)">Vendue</option>
+                <option value="@((int)StatutVoiture.EnReparation)">En réparation</option>
+                <option value="@((int)StatutVoiture.NonDisponible)">Non disponible</option>
+            </select>
+        </form>
+    </div>
+    <div class="col-md-6 text-right">
+        <a asp-action="Index" class="btn btn-outline-secondary">Réinitialiser les filtres</a>
+    </div>
+</div>
+
+<div class="row">
+    @foreach (var voiture in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                @{
+                    var photo = voiture.Photos.FirstOrDefault();
+                    var photoUrl = photo != null ? photo.CheminImage : "/images/no-image.png";
+                }
+                <div class="position-relative">
+                    <img src="@photoUrl" class="card-img-top" alt="@voiture.Modele.Marque.Nom @voiture.Modele.Nom">
+                    <div class="position-absolute top-0 end-0 p-2">
+                        @switch (voiture.Statut)
+                        {
+                            case StatutVoiture.Disponible:
+                                <span class="badge bg-success text-white">Disponible</span>
+                                break;
+                            case StatutVoiture.Reservee:
+                                <span class="badge bg-warning text-dark">Réservée</span>
+                                break;
+                            case StatutVoiture.Vendue:
+                                <span class="badge bg-danger text-white">Vendue</span>
+                                break;
+                            case StatutVoiture.EnReparation:
+                                <span class="badge bg-info text-dark">En réparation</span>
+                                break;
+                            case StatutVoiture.NonDisponible:
+                                <span class="badge bg-secondary text-white">Non disponible</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-primary btn-sm">Voir détails</a>
+                    @if (User.IsInRole("Administrateur"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@voiture.Id" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                    }
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom (@voiture.Annee)</h5>
+                    <p class="card-text">
+                        <strong>Prix:</strong> @voiture.Prix.ToString("C0")<br />
+                        <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km<br />
+                        <strong>Date d'acquisition:</strong> @voiture.DateAcquisition.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+                <div class="card-footer">
+                @if (User.IsInRole("Administrateur"))
+                {
+                    <a asp-action="Edit" asp-route-id="@voiture.Id" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <div class="dropdown d-inline-block">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton@(voiture.Id)" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-tag"></i> Statut
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@(voiture.Id)">
+                            @foreach (StatutVoiture statut in Enum.GetValues(typeof(StatutVoiture)))
+                            {
+                                if (statut != voiture.Statut)
+                                {
+                                    <li>
+                                        <form asp-action="QuickStatusChange" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@voiture.Id" />
+                                            <input type="hidden" name="statut" value="@((int)statut)" />
+                                            <button type="submit" class="dropdown-item">
+                                                @statut
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+                    <a asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-primary btn-sm">Voir détails</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        Aucune voiture ne correspond à vos critères de recherche.
+    </div>
+}

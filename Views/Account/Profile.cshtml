@@ -1,0 +1,32 @@
+@model EMGANSA.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Mon profil";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3>Informations personnelles</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Email)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
+                    
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Nom)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Nom)</dd>
+                    
+                    <dt class="col-sm-4">@Html.DisplayNameFor(model => model.Prenom)</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Prenom)</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Index" asp-controller="Home" class="btn btn-primary">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
+</div>

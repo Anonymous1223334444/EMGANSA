@@ -1,0 +1,179 @@
+@model EMGANSA.Models.VoitureViewModel
+
+@{
+    ViewData["Title"] = "Modifier une voiture";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Informations générales</h4>
+                </div>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="ModeleId" class="control-label"></label>
+                        <select asp-for="ModeleId" class="form-control" asp-items="ViewBag.ModeleId"></select>
+                        <span asp-validation-for="ModeleId" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Annee" class="control-label"></label>
+                                <input asp-for="Annee" class="form-control" />
+                                <span asp-validation-for="Annee" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Kilometrage" class="control-label"></label>
+                                <input asp-for="Kilometrage" class="form-control" />
+                                <span asp-validation-for="Kilometrage" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Prix" class="control-label"></label>
+                                <input asp-for="Prix" class="form-control" />
+                                <span asp-validation-for="Prix" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="DateAcquisition" class="control-label"></label>
+                                <input asp-for="DateAcquisition" class="form-control" type="date" />
+                                <span asp-validation-for="DateAcquisition" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Statut" class="control-label"></label>
+                        <select asp-for="Statut" class="form-control" asp-items="Html.GetEnumSelectList<EMGANSA.Models.StatutVoiture>()"></select>
+                        <span asp-validation-for="Statut" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Gestion des photos -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Photos actuelles</h4>
+                </div>
+                <div class="card-body">
+                    <div id="photos-container">
+                        @{
+                            var voiture = await _context.Voitures
+                                .Include(v => v.Photos)
+                                .FirstOrDefaultAsync(v => v.Id == Model.Id);
+                                
+                            if (voiture != null && voiture.Photos.Any())
+                            {
+                                foreach (var photo in voiture.Photos)
+                                {
+                                    <div class="card mb-2">
+                                        <div class="card-body p-2">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <img src="@photo.CheminImage" class="img-thumbnail" alt="@photo.Titre" />
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="form-check mb-2">
+                                                        <input type="checkbox" class="form-check-input" name="PhotosASupprimer" value="@photo.Id" id="photo-@photo.Id">
+                                                        <label class="form-check-label" for="photo-@photo.Id">Supprimer</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="PhotoPrincipale" value="@photo.Id" id="principale-@photo.Id" @(photo.EstPrincipale ? "checked" : "")>
+                                                        <label class="form-check-label" for="principale-@photo.Id">Photo principale</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">
+                                    Aucune photo disponible.
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ajout de nouvelles photos -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>Ajouter des photos</h4>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="Photos" class="control-label"></label>
+                        <input asp-for="Photos" type="file" class="form-control" multiple accept="image/*" />
+                        <span asp-validation-for="Photos" class="text-danger"></span>
+                        <small class="form-text text-muted">
+                            Vous pouvez sélectionner plusieurs photos.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Enregistrer
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Script pour gérer les photos
+        $(document).ready(function() {
+            // Gestion des cases à cocher pour la suppression des photos
+            $('input[name="PhotosASupprimer"]').on('change', function() {
+                var photoId = $(this).val();
+                if ($(this).is(':checked')) {
+                    // Si la photo à supprimer est aussi marquée comme principale
+                    if ($('#principale-' + photoId).is(':checked')) {
+                        $('#principale-' + photoId).prop('checked', false);
+                    }
+                }
+            });
+            
+            // Gestion des boutons radio pour la photo principale
+            $('input[name="PhotoPrincipale"]').on('change', function() {
+                var photoId = $(this).val();
+                // Désélectionner la case à cocher de suppression
+                $('#photo-' + photoId).prop('checked', false);
+            });
+        });
+    </script>
+}
