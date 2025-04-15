@@ -81,6 +81,133 @@ namespace EMGANSA.Controllers
             return View(statutsDict);
         }
 
+        // GET: Voitures/Recherche
+        public async Task<IActionResult> Recherche(RechercheAvanceeViewModel viewModel)
+        {
+            // Préparer les listes déroulantes
+            viewModel.Marques = new SelectList(await _context.Marques.OrderBy(m => m.Nom).ToListAsync(), "Id", "Nom");
+            viewModel.Statuts = new SelectList(Enum.GetValues(typeof(StatutVoiture))
+                .Cast<StatutVoiture>()
+                .Select(s => new { Id = (int)s, Nom = s.ToString() }), "Id", "Nom");
+            
+            if (viewModel.MarqueId.HasValue)
+            {
+                viewModel.Modeles = new SelectList(
+                    await _context.Modeles
+                        .Where(m => m.MarqueId == viewModel.MarqueId)
+                        .OrderBy(m => m.Nom)
+                        .ToListAsync(), 
+                    "Id", "Nom");
+            }
+            else
+            {
+                viewModel.Modeles = new SelectList(Enumerable.Empty<SelectListItem>());
+            }
+            
+            // Construire la requête
+            var query = _context.Voitures
+                .Include(v => v.Modele)
+                .ThenInclude(m => m.Marque)
+                .Include(v => v.Photos.Where(p => p.EstPrincipale))
+                .AsQueryable();
+            
+            // Appliquer les filtres
+            if (viewModel.MarqueId.HasValue)
+            {
+                query = query.Where(v => v.Modele.MarqueId == viewModel.MarqueId);
+            }
+            
+            if (viewModel.ModeleId.HasValue)
+            {
+                query = query.Where(v => v.ModeleId == viewModel.ModeleId);
+            }
+            
+            if (viewModel.AnneeMin.HasValue)
+            {
+                query = query.Where(v => v.Annee >= viewModel.AnneeMin);
+            }
+            
+            if (viewModel.AnneeMax.HasValue)
+            {
+                query = query.Where(v => v.Annee <= viewModel.AnneeMax);
+            }
+            
+            if (viewModel.PrixMin.HasValue)
+            {
+                query = query.Where(v => v.Prix >= viewModel.PrixMin);
+            }
+            
+            if (viewModel.PrixMax.HasValue)
+            {
+                query = query.Where(v => v.Prix <= viewModel.PrixMax);
+            }
+            
+            if (viewModel.KilometrageMax.HasValue)
+            {
+                query = query.Where(v => v.Kilometrage <= viewModel.KilometrageMax);
+            }
+            
+            if (viewModel.Statut.HasValue)
+            {
+                query = query.Where(v => v.Statut == viewModel.Statut);
+            }
+            
+            // Appliquer le tri
+            if (!string.IsNullOrEmpty(viewModel.TriPar))
+            {
+                var ordre = viewModel.Ordre?.ToLower() == "desc" ? "desc" : "asc";
+                
+                switch (viewModel.TriPar.ToLower())
+                {
+                    case "prix":
+                        query = ordre == "desc" 
+                            ? query.OrderByDescending(v => v.Prix) 
+                            : query.OrderBy(v => v.Prix);
+                        break;
+                    case "annee":
+                        query = ordre == "desc" 
+                            ? query.OrderByDescending(v => v.Annee) 
+                            : query.OrderBy(v => v.Annee);
+                        break;
+                    case "kilometrage":
+                        query = ordre == "desc" 
+                            ? query.OrderByDescending(v => v.Kilometrage) 
+                            : query.OrderBy(v => v.Kilometrage);
+                        break;
+                    case "dateacquisition":
+                        query = ordre == "desc" 
+                            ? query.OrderByDescending(v => v.DateAcquisition) 
+                            : query.OrderBy(v => v.DateAcquisition);
+                        break;
+                    default:
+                        query = query.OrderByDescending(v => v.DateAcquisition);
+                        break;
+                }
+            }
+            else
+            {
+                query = query.OrderByDescending(v => v.DateAcquisition);
+            }
+            
+            // Exécuter la requête
+            viewModel.Resultats = await query.ToListAsync();
+            
+            return View(viewModel);
+        }
+
+        // Endpoint pour les modèles par marque
+        [HttpGet]
+        public async Task<IActionResult> GetModelesByMarque(int marqueId)
+        {
+            var modeles = await _context.Modeles
+                .Where(m => m.MarqueId == marqueId)
+                .OrderBy(m => m.Nom)
+                .Select(m => new { id = m.Id, nom = m.Nom })
+                .ToListAsync();
+            
+            return Json(modeles);
+        }
+
         // GET: Voitures/Details/5 - Affiche les détails d'une voiture
         public async Task<IActionResult> Details(int? id)
         {

@@ -33,6 +33,15 @@
                 </div>
 
             </div>
+
+            <div class="col-md-6 text-right">
+                <a asp-action="Recherche" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-search"></i> Recherche avancée
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Réinitialiser les filtres
+                </a>
+            </div>
             <select name="statut" class="form-control mb-2 mr-sm-2" onchange="this.form.submit()">
                 <option value="">Tous les statuts</option>
                 <option value="@((int)StatutVoiture.Disponible)">Disponible</option>

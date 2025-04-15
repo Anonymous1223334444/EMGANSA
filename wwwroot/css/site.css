@@ -4,8 +4,9 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin-bottom: 340px; /* Adjusted for the bigger footer */
   background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .footer {
@@ -14,17 +15,31 @@ body {
   width: 100%;
   white-space: nowrap;
   line-height: 60px;
+  background-color: #343a40;
+  color: #fff;
+}
+
+.footer a {
+  color: #adb5bd;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 
 .jumbotron {
-  padding: 2rem 1rem;
-  margin-bottom: 2rem;
   background-color: #e9ecef;
+  padding: 2rem;
+  margin-bottom: 2rem;
   border-radius: 0.3rem;
 }
 
 .card {
-  transition: transform 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 .card:hover {
@@ -39,16 +54,16 @@ body {
 
 .navbar-brand {
   font-weight: bold;
-  color: #fff;
+  font-size: 1.5rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
   color: #343a40;
+  font-weight: 600;
 }
 
-.badge {
-  font-size: 0.75rem;
-  padding: 0.35em 0.65em;
+.btn {
+  border-radius: 0.3rem;
 }
 
 .btn-primary {
@@ -59,4 +74,55 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background-color: #0b5ed7;
   border-color: #0a58ca;
+}
+
+/* Badge styles */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+  border-radius: 0.25rem;
+}
+
+/* Shadows */
+.shadow-sm {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075)!important;
+}
+
+/* Custom color for price */
+.text-primary {
+  color: #0d6efd!important;
+}
+
+/* Custom table styles */
+.table {
+  --bs-table-hover-bg: rgba(0, 123, 255, 0.05);
+  --bs-table-hover-color: inherit;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+}
+
+/* Custom input focus */
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Animation for hover effects */
+a, .btn, .nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  body {
+    margin-bottom: 500px;
+  }
+  
+  .card-img-top {
+    height: 180px;
+  }
 }

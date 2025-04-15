@@ -1,0 +1,209 @@
+@model EMGANSA.Models.RechercheAvanceeViewModel
+
+@{
+    ViewData["Title"] = "Recherche avancée";
+}
+
+<h1>Recherche avancée</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-search"></i> Critères de recherche</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Recherche" method="get" id="rechercheForm">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="MarqueId" class="control-label"></label>
+                        <select asp-for="MarqueId" class="form-control" asp-items="Model.Marques">
+                            <option value="">-- Toutes les marques --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="ModeleId" class="control-label"></label>
+                        <select asp-for="ModeleId" class="form-control" asp-items="Model.Modeles">
+                            <option value="">-- Tous les modèles --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="AnneeMin" class="control-label"></label>
+                                <input asp-for="AnneeMin" class="form-control" />
+                                <span asp-validation-for="AnneeMin" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="AnneeMax" class="control-label"></label>
+                                <input asp-for="AnneeMax" class="form-control" />
+                                <span asp-validation-for="AnneeMax" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PrixMin" class="control-label"></label>
+                                <input asp-for="PrixMin" class="form-control" />
+                                <span asp-validation-for="PrixMin" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="PrixMax" class="control-label"></label>
+                                <input asp-for="PrixMax" class="form-control" />
+                                <span asp-validation-for="PrixMax" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="KilometrageMax" class="control-label"></label>
+                        <input asp-for="KilometrageMax" class="form-control" />
+                        <span asp-validation-for="KilometrageMax" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label asp-for="Statut" class="control-label"></label>
+                        <select asp-for="Statut" class="form-control" asp-items="Model.Statuts">
+                            <option value="">-- Tous les statuts --</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="TriPar" class="control-label"></label>
+                                <select asp-for="TriPar" class="form-control">
+                                    <option value="dateacquisition">Date d'acquisition</option>
+                                    <option value="prix">Prix</option>
+                                    <option value="annee">Année</option>
+                                    <option value="kilometrage">Kilométrage</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Ordre" class="control-label"></label>
+                                <select asp-for="Ordre" class="form-control">
+                                    <option value="desc">Décroissant</option>
+                                    <option value="asc">Croissant</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mt-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> Rechercher
+                        </button>
+                    </div><div class="form-group mt-2">
+                       <a href="@Url.Action("Recherche")" class="btn btn-outline-secondary w-100">
+                           <i class="bi bi-x-circle"></i> Réinitialiser
+                       </a>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+   
+   <div class="col-md-8">
+       <div class="card shadow-sm">
+           <div class="card-header bg-primary text-white">
+               <h4 class="mb-0"><i class="bi bi-list-ul"></i> Résultats de recherche</h4>
+           </div>
+           <div class="card-body">
+               @if (Model.Resultats != null && Model.Resultats.Any())
+               {
+                   <p>@Model.Resultats.Count voiture(s) trouvée(s)</p>
+                   
+                   <div class="row">
+                       @foreach (var voiture in Model.Resultats)
+                       {
+                           <div class="col-md-6 mb-4">
+                               <div class="card h-100 shadow-sm">
+                                   @{
+                                       var photo = voiture.Photos.FirstOrDefault();
+                                       var photoUrl = photo != null ? photo.CheminImage : "/images/voitures/no-image.jpg";
+                                   }
+                                   <div class="position-relative">
+                                       <img src="@photoUrl" class="card-img-top" style="height: 180px; object-fit: cover;" alt="@voiture.Modele.Marque.Nom @voiture.Modele.Nom">
+                                       <div class="position-absolute top-0 end-0 p-2">
+                                           <span class="badge @GetBadgeClass(voiture.Statut)">@voiture.Statut</span>
+                                       </div>
+                                   </div>
+                                   <div class="card-body">
+                                       <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom</h5>
+                                       <p class="card-text">
+                                           <strong>Année:</strong> @voiture.Annee<br>
+                                           <strong>Prix:</strong> <span class="text-primary">@voiture.Prix.ToString("C0")</span><br>
+                                           <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km
+                                       </p>
+                                   </div>
+                                   <div class="card-footer bg-white">
+                                       <a asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-outline-primary btn-sm">Voir détails</a>
+                                   </div>
+                               </div>
+                           </div>
+                       }
+                   </div>
+               }
+               else
+               {
+                   <div class="alert alert-info">
+                       Aucune voiture ne correspond à vos critères de recherche.
+                   </div>
+               }
+           </div>
+       </div>
+   </div>
+</div>
+
+@section Scripts {
+   @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+   
+   <script>
+       $(document).ready(function() {
+           // Chargement dynamique des modèles en fonction de la marque
+           $('#MarqueId').change(function() {
+               var marqueId = $(this).val();
+               var modeleSelect = $('#ModeleId');
+               
+               // Réinitialiser la liste des modèles
+               modeleSelect.empty();
+               modeleSelect.append('<option value="">-- Tous les modèles --</option>');
+               
+               if (marqueId) {
+                   // Charger les modèles de la marque sélectionnée
+                   $.getJSON('@Url.Action("GetModelesByMarque")', { marqueId: marqueId }, function(data) {
+                       $.each(data, function(index, item) {
+                           modeleSelect.append($('<option></option>').val(item.id).text(item.nom));
+                       });
+                   });
+               }
+           });
+       });
+   </script>
+}
+
+@functions {
+   string GetBadgeClass(StatutVoiture statut)
+   {
+       return statut switch
+       {
+           StatutVoiture.Disponible => "bg-success text-white",
+           StatutVoiture.Reservee => "bg-warning text-dark",
+           StatutVoiture.Vendue => "bg-danger text-white",
+           StatutVoiture.EnReparation => "bg-info text-dark",
+           StatutVoiture.NonDisponible => "bg-secondary text-white",
+           _ => "bg-secondary"
+       };
+   }
+}
