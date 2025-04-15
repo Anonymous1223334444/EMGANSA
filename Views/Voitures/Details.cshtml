@@ -90,6 +90,16 @@
         </table>
 
         <div class="mt-4">
+            <a asp-action="Index" class="btn btn-secondary">Retour à la liste</a>
+            @if (User.IsInRole("Administrateur"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Modifier
+                </a>
+            }
+        </div>
+
+        <div class="mt-4">
             <h4>Description</h4>
             <p>@(string.IsNullOrEmpty(Model.Description) ? "Aucune description disponible" : Model.Description)</p>
         </div>

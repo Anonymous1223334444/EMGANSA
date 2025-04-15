@@ -6,14 +6,14 @@
 
 <h1 class="mb-4">Inventaire des voitures</h1>
 
-<!-- @if (User.IsInRole("Administrateur"))
-{ -->
-<div class="mb-3">
-    <a asp-action="Create" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Ajouter une voiture
-    </a>
-</div>
-<!-- } -->
+@if (User.IsInRole("Administrateur"))
+{
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Ajouter une voiture
+        </a>
+    </div>
+}
 
 <div class="alert alert-info">
     <p>IsAuthenticated: @User.Identity.IsAuthenticated</p>
@@ -79,6 +79,15 @@
                                 break;
                         }
                     </div>
+                </div>
+                <div class="card-footer">
+                    <a asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-primary btn-sm">Voir détails</a>
+                    @if (User.IsInRole("Administrateur"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@voiture.Id" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                    }
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom (@voiture.Annee)</h5>

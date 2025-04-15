@@ -184,5 +184,128 @@ namespace EMGANSA.Controllers
             
             await _context.SaveChangesAsync();
         }
+
+        // GET: Voitures/Edit/5
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var voiture = await _context.Voitures
+                .Include(v => v.Modele)
+                .Include(v => v.Photos)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            
+            if (voiture == null)
+            {
+                return NotFound();
+            }
+            
+            var viewModel = new VoitureViewModel
+            {
+                Id = voiture.Id,
+                ModeleId = voiture.ModeleId,
+                Annee = voiture.Annee,
+                Kilometrage = voiture.Kilometrage,
+                Prix = voiture.Prix,
+                DateAcquisition = voiture.DateAcquisition,
+                Description = voiture.Description,
+                Statut = voiture.Statut
+            };
+
+            ViewData["ModeleId"] = new SelectList(_context.Modeles
+                .Include(m => m.Marque)
+                .OrderBy(m => m.Marque.Nom)
+                .ThenBy(m => m.Nom), "Id", "NomComplet", voiture.ModeleId);
+            
+            return View(viewModel);
+        }
+
+        // POST: Voitures/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> Edit(int id, VoitureViewModel viewModel)
+        {
+            if (id != viewModel.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var voiture = await _context.Voitures.FindAsync(id);
+                    if (voiture == null)
+                    {
+                        return NotFound();
+                    }
+                    
+                    // Mettre à jour les propriétés
+                    voiture.ModeleId = viewModel.ModeleId;
+                    voiture.Annee = viewModel.Annee;
+                    voiture.Kilometrage = viewModel.Kilometrage;
+                    voiture.Prix = viewModel.Prix;
+                    voiture.DateAcquisition = viewModel.DateAcquisition;
+                    voiture.Description = viewModel.Description;
+                    voiture.Statut = viewModel.Statut;
+                    
+                    _context.Update(voiture);
+                    await _context.SaveChangesAsync();
+                    
+                    // Traiter les photos si elles existent
+                    if (viewModel.Photos != null && viewModel.Photos.Count > 0)
+                    {
+                        await _photoService.EnregistrerPhotosAsync(voiture.Id, viewModel.Photos);
+                    }
+                    
+                    // Supprimer les photos sélectionnées
+                    if (viewModel.PhotosASupprimer != null && viewModel.PhotosASupprimer.Count > 0)
+                    {
+                        foreach (var photoId in viewModel.PhotosASupprimer)
+                        {
+                            await _photoService.SupprimerPhotoAsync(photoId);
+                        }
+                    }
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!VoitureExists(viewModel.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            
+            ViewData["ModeleId"] = new SelectList(_context.Modeles
+                .Include(m => m.Marque)
+                .OrderBy(m => m.Marque.Nom)
+                .ThenBy(m => m.Nom), "Id", "NomComplet", viewModel.ModeleId);
+            
+            return View(viewModel);
+        }
+
+        private bool VoitureExists(int id)
+        {
+            return _context.Voitures.Any(e => e.Id == id);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrateur")]
+        public async Task<IActionResult> SetMainPhoto(int photoId, int voitureId)
+        {
+            await _photoService.DefinirPhotoPrincipaleAsync(photoId, voitureId);
+            return RedirectToAction(nameof(Edit), new { id = voitureId });
+        }
     }
 }
