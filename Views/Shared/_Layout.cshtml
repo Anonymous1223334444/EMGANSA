@@ -3,70 +3,76 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EMGANSA</title>
+    <title>@ViewData["Title"] - EMG Voitures</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EMGANSA.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    EMGANSA
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-car-front me-2"></i> EMG Voitures
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Accueil</a>
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house"></i> Accueil
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Index">Inventaire</a>
+                            <a class="nav-link" asp-controller="Voitures" asp-action="Index">
+                                <i class="bi bi-car-front"></i> Inventaire
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Voitures" asp-action="Dashboard">
+                                <i class="bi bi-graph-up"></i> Tableau de bord
+                            </a>
                         </li>
                         @if (User.IsInRole("Administrateur"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="JWT" asp-action="Test">Test JWT</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i> Administration
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Register">Créer un utilisateur</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Voitures" asp-action="Create">Ajouter une voiture</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="JWT" asp-action="Test">Test JWT</a></li>
+                                </ul>
                             </li>
-                            
                         }
                     </ul>
                     <ul class="navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Profile">
-                                    <i class="bi bi-person-fill"></i> @User.Identity.Name
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
                                 </a>
-                            </li>
-                            <li class="nav-item">
-                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-                                    <button type="submit" class="btn btn-link nav-link">
-                                        <i class="bi bi-box-arrow-right"></i> Déconnexion
-                                    </button>
-                                </form>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Dashboard">
-                                    <i class="bi bi-graph-up"></i> Tableau de bord
-                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Mon profil</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item">Déconnexion</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
                                     <i class="bi bi-box-arrow-in-right"></i> Connexion
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Dashboard">
-                                    <i class="bi bi-graph-up"></i> Tableau de bord
                                 </a>
                             </li>
                         }
@@ -75,17 +81,41 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container-fluid py-4">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - EMGANSA - <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a>
+    <footer class="border-top footer text-muted bg-dark text-white">
+        <div class="container-fluid">
+            <div class="row py-3">
+                <div class="col-md-6">
+                    <h5>EMG Voitures</h5>
+                    <p>Spécialiste de la vente de voitures d'occasion de qualité.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Liens</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Accueil</a></li>
+                        <li><a href="#" class="text-white">Inventaire</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contact</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-telephone"></i> 01 23 45 67 89</li>
+                        <li><i class="bi bi-envelope"></i> contact@emgvoitures.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-top pt-2">
+                <p>&copy; 2025 - EMG Voitures</p>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

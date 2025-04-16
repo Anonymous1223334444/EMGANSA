@@ -1,148 +1,61 @@
-﻿<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - EMG Voitures</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/EMGANSA.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-car-front me-2"></i> EMG Voitures
+﻿@model IEnumerable<EMGANSA.Models.Voiture>
+@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="container-fluid px-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="bg-light p-4 rounded">
+                <h1>Bienvenue chez EMG Voitures</h1>
+                <p class="lead">Trouvez la voiture de vos rêves parmi notre sélection soigneusement inspectée</p>
+                <p>Tous nos véhicules sont inspectés et remis en état pour vous garantir fiabilité et satisfaction.</p>
+                <a class="btn btn-primary" asp-controller="Voitures" asp-action="Index">
+                    Voir notre inventaire
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house"></i> Accueil
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Index">
-                                <i class="bi bi-car-front"></i> Inventaire
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Voitures" asp-action="Dashboard">
-                                <i class="bi bi-graph-up"></i> Tableau de bord
-                            </a>
-                        </li>
-                        @if (User.IsInRole("Administrateur"))
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-gear"></i> Administration
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Register">
-                                            <i class="bi bi-person-plus"></i> Créer un utilisateur
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Voitures" asp-action="Create">
-                                            <i class="bi bi-plus-circle"></i> Ajouter une voiture
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="JWT" asp-action="Test">
-                                            <i class="bi bi-key"></i> Test JWT
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="bi bi-person"></i> Mon profil
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-                                            <button type="submit" class="dropdown-item">
-                                                <i class="bi bi-box-arrow-right"></i> Déconnexion
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="bi bi-box-arrow-in-right"></i> Connexion
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <main role="main">
-        <div class="container py-4">
-            @RenderBody()
-        </div>
-    </main>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            <div class="row py-4">
-                <div class="col-md-6">
-                    <h5>EMG Voitures</h5>
-                    <p>
-                        Spécialiste de la vente de voitures d'occasion de qualité.
-                        <br />
-                        15 Rue des Automobiles, 75000 Paris
-                    </p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Liens</h5>
-                    <ul class="list-unstyled">
-                        <li><a asp-controller="Home" asp-action="Index">Accueil</a></li>
-                        <li><a asp-controller="Voitures" asp-action="Index">Inventaire</a></li>
-                        <li><a asp-controller="Home" asp-action="Privacy">Confidentialité</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h5>Contact</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-telephone"></i> 01 23 45 67 89</li>
-                        <li><i class="bi bi-envelope"></i> contact@emgvoitures.com</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-top pt-3">
-                <p>&copy; 2025 - EMG Voitures - <a asp-area="" asp-controller="Home" asp-action="Privacy">Confidentialité</a></p>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
-</html>
+    <h2 class="mb-3">Nos dernières arrivées</h2>
+
+    <div class="row">
+        @foreach (var voiture in Model)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="row g-0">
+                        <div class="col-md-6">
+                            @{
+                                var photo = voiture.Photos.FirstOrDefault(p => p.EstPrincipale) ?? voiture.Photos.FirstOrDefault();
+                                var photoUrl = photo != null ? photo.CheminImage : "/images/no-image.png";
+                            }
+                            <img src="@photoUrl" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover;" alt="@voiture.Modele.Marque.Nom @voiture.Modele.Nom">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card-body">
+                                <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom (@voiture.Annee)</h5>
+                                <p class="card-text">
+                                    <strong>Prix:</strong> @voiture.Prix.ToString("C0")<br>
+                                    <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge @(voiture.Statut == StatutVoiture.Disponible ? "bg-success" : "bg-secondary")">
+                                        @voiture.Statut
+                                    </span>
+                                    <a asp-controller="Voitures" asp-action="Details" asp-route-id="@voiture.Id" class="btn btn-outline-primary btn-sm">Voir détails</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-center mt-4 mb-4">
+        <a asp-controller="Voitures" asp-action="Index" class="btn btn-primary">
+            Voir toutes nos voitures
+        </a>
+    </div>
+</div>

@@ -344,6 +344,11 @@ namespace EMGANSA.Controllers
                 .Include(v => v.Modele)
                 .Include(v => v.Photos)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
+            var photos = await _context.PhotosVoitures
+                .Where(p => p.VoitureId == id)
+                .ToListAsync();
+            ViewBag.Photos = photos;
             
             if (voiture == null)
             {
