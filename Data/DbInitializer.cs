@@ -56,7 +56,7 @@ namespace EMGANSA.Data
                         ModeleId = 1, // Toyota Corolla
                         Annee = 2022,
                         Kilometrage = 15000,
-                        Prix = 23500M,
+                        Prix = 2350000M,
                         DateAcquisition = DateTime.Now.AddMonths(-3),
                         Description = "Toyota Corolla en excellent état, première main, entretien régulier.",
                         Statut = StatutVoiture.Disponible
@@ -66,7 +66,7 @@ namespace EMGANSA.Data
                         ModeleId = 2, // Renault Clio
                         Annee = 2020,
                         Kilometrage = 35000,
-                        Prix = 14500M,
+                        Prix = 1450000M,
                         DateAcquisition = DateTime.Now.AddMonths(-1),
                         Description = "Renault Clio bien entretenue, carnet d'entretien à jour, faible consommation.",
                         Statut = StatutVoiture.Disponible
@@ -76,7 +76,7 @@ namespace EMGANSA.Data
                         ModeleId = 3, // Peugeot 208
                         Annee = 2019,
                         Kilometrage = 45000,
-                        Prix = 12800M,
+                        Prix = 1280000M,
                         DateAcquisition = DateTime.Now.AddDays(-15),
                         Description = "Peugeot 208 avec GPS intégré, climatisation, capteurs de recul.",
                         Statut = StatutVoiture.EnReparation

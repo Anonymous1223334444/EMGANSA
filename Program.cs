@@ -6,6 +6,9 @@ using EMGANSA.Data;
 using EMGANSA.Models;
 using EMGANSA.Services;
 using System.Text;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,34 +56,45 @@ builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<PhotoService>();
 
-// Configurer l'authentification JWT
+// Configurer l'authentification JWT SANS écraser le schéma par défaut
 var jwtConfig = builder.Configuration.GetSection("JWT").Get<JwtConfig>();
 var key = Encoding.ASCII.GetBytes(jwtConfig.Secret);
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
+// CORRECTION: Ne pas définir JWT comme schéma par défaut
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidIssuer = jwtConfig.Issuer,
-        ValidAudience = jwtConfig.Audience,
-        RequireExpirationTime = true,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidIssuer = jwtConfig.Issuer,
+            ValidAudience = jwtConfig.Audience,
+            RequireExpirationTime = true,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 var app = builder.Build();
+
+var supportedCultures = new[] { new CultureInfo("fr-SN") };
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("fr-SN"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures
+});
+
+var senegalCulture = (CultureInfo)CultureInfo.GetCultureInfo("fr-SN").Clone();
+senegalCulture.NumberFormat.CurrencySymbol = "FCFA";
+senegalCulture.NumberFormat.CurrencyDecimalSeparator = ",";
+senegalCulture.NumberFormat.CurrencyGroupSeparator = " ";
+CultureInfo.DefaultThreadCurrentCulture = senegalCulture;
+CultureInfo.DefaultThreadCurrentUICulture = senegalCulture;
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

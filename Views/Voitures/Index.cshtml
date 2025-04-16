@@ -15,12 +15,6 @@
     </div>
 }
 
-<div class="alert alert-info">
-    <p>IsAuthenticated: @User.Identity.IsAuthenticated</p>
-    <p>Name: @User.Identity.Name</p>
-    <p>IsInRole("Administrateur"): @User.IsInRole("Administrateur")</p>
-</div>
-
 <div class="row mb-4">
     <div class="col-md-6">
         <form asp-action="Index" method="get" class="form-inline">
@@ -101,7 +95,7 @@
                 <div class="card-body">
                     <h5 class="card-title">@voiture.Modele.Marque.Nom @voiture.Modele.Nom (@voiture.Annee)</h5>
                     <p class="card-text">
-                        <strong>Prix:</strong> @voiture.Prix.ToString("C0")<br />
+                        <strong>Prix:</strong> @voiture.Prix.ToString("N0") FCFA<br />
                         <strong>Kilométrage:</strong> @voiture.Kilometrage.ToString("N0") km<br />
                         <strong>Date d'acquisition:</strong> @voiture.DateAcquisition.ToString("dd/MM/yyyy")
                     </p>
